@@ -19,9 +19,11 @@ import io.netty.util.concurrent.EventExecutor;
 
 /**
  * Will handle all the I/O-Operations for a {@link Channel} once it was registered.
+ * 一个Channel一旦被注册上来，其上所有的I/O操作都会被该EventLoop所处理
  *
  * One {@link EventLoop} instance will usually handle more then one {@link Channel} but this may depend on
  * implementation details and internals.
+ * 一个EventLoop的实例一般至少会处理一个Channel，但是还是依赖子类的具体实现
  *
  */
 public interface EventLoop extends EventExecutor, EventLoopGroup {
