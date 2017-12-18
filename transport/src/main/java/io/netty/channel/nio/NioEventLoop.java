@@ -46,6 +46,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * {@link SingleThreadEventLoop} implementation which register the {@link Channel}'s to a
  * {@link Selector} and so does the multi-plexing of these in the event loop.
  *
+ * SingleThreadEventLoop 的实现，用来将 Channel 注册到一个 Selector 上，以便在该 event loop 中进行多路选择
+ *
  */
 public final class NioEventLoop extends SingleThreadEventLoop {
 
@@ -301,8 +303,15 @@ public final class NioEventLoop extends SingleThreadEventLoop {
             oldWakenUp = wakenUp.getAndSet(false);
             try {
                 if (hasTasks()) {
+                    /**
+                     * 如果有定时任务需要执行，则这里采用非阻塞的方式来获取已经就绪的channel
+                     * 也就是说，该情况下，有就绪的channel就获取，没有就立马返回，至少还有task可以执行
+                     */
                     selectNow();
                 } else {
+                    /**
+                     * 当任务队列中没有任务时，则采用阻塞的方式来获取就绪channel
+                     */
                     select();
 
                     // 'wakenUp.compareAndSet(false, true)' is always evaluated
@@ -619,9 +628,9 @@ public final class NioEventLoop extends SingleThreadEventLoop {
                 selectCnt ++;
 
                 if (selectedKeys != 0 || oldWakenUp || wakenUp.get() || hasTasks()) {
-                    // Selected something,
-                    // waken up by user, or
-                    // the task queue has a pending task.
+                    // Selected something,                  选择到了就绪的channel
+                    // waken up by user, or                 被唤醒
+                    // the task queue has a pending task.   任务队列中有任务
                     break;
                 }
                 if (selectedKeys == 0 && Thread.interrupted()) {

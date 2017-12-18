@@ -47,6 +47,7 @@ import java.util.regex.Pattern;
  * Utility that detects various properties specific to the current runtime
  * environment, such as Java version and the availability of the
  * {@code sun.misc.Unsafe} object.
+ * 用来检测当前运行环境中的属性的工具
  * <p>
  * You can disable the use of {@code sun.misc.Unsafe} if you specify
  * the system property <strong>io.netty.noUnsafe</strong>.
@@ -377,6 +378,7 @@ public final class PlatformDependent {
     /**
      * Create a new {@link Queue} which is safe to use for multiple producers (different threads) and a single
      * consumer (one thread!).
+     * 创建一个新的Queue，它可以安全的用在多生产者，一个消费者的场景下
      */
     public static <T> Queue<T> newMpscQueue() {
         return new MpscLinkedQueue<T>();
