@@ -21,6 +21,8 @@ package io.netty.util.concurrent;
  * Beside this it also extends the {@link EventExecutorGroup} to allow a generic way to
  * access methods.
  *
+ * EventExecutor 是一个特殊的 EventExecutorGroup , 它具有一些方法来查看一个 Thread 是否是在一个 event loop 中执行的
+ *
  */
 public interface EventExecutor extends EventExecutorGroup {
 
