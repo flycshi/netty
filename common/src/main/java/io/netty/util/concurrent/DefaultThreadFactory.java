@@ -63,6 +63,14 @@ public class DefaultThreadFactory implements ThreadFactory {
         this(toPoolName(poolType), daemon, priority);
     }
 
+    /**
+     * 1、如果类名为空，则返回unknown
+     * 2、如果类名为1个字符，则返回该字符的小写
+     * 3、如果第一个字符大写，且第二个字符小写，则将第一个字符变小写，并返回，否则直接返回类名
+     * 对于 NioEventLoopGroup , 返回的就是 nioEventLoopGroup
+     * @param poolType
+     * @return
+     */
     private static String toPoolName(Class<?> poolType) {
         if (poolType == null) {
             throw new NullPointerException("poolType");
