@@ -430,6 +430,10 @@ public abstract class AbstractChannel extends DefaultAttributeMap implements Cha
             }
         }
 
+        /**
+         * 将channel注册到eventloop上的地方
+         * @param promise
+         */
         private void register0(ChannelPromise promise) {
             try {
                 // check if the channel is still open as it could be closed in the mean time when the register
@@ -440,8 +444,14 @@ public abstract class AbstractChannel extends DefaultAttributeMap implements Cha
                 doRegister();
                 registered = true;
                 safeSetSuccess(promise);
+                /**
+                 * 当完成注册后，就会调用ChannelPipeline的fireChannelRegistered方法
+                 */
                 pipeline.fireChannelRegistered();
                 if (isActive()) {
+                    /**
+                     * 如果channel还处于活跃状态，则调用ChannlePipeline的fireChannelActive方法
+                     */
                     pipeline.fireChannelActive();
                 }
             } catch (Throwable t) {

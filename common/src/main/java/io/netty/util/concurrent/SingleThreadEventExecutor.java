@@ -39,6 +39,8 @@ import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 /**
  * Abstract base class for {@link EventExecutor}'s that execute all its submitted tasks in a single thread.
  *
+ * EventExecutor 的抽象基类，会在一个线程中执行所有提交的任务
+ *
  */
 public abstract class SingleThreadEventExecutor extends AbstractEventExecutor {
 

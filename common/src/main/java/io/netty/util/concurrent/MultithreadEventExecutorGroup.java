@@ -209,14 +209,27 @@ public abstract class MultithreadEventExecutorGroup extends AbstractEventExecuto
         return isTerminated();
     }
 
+    /**
+     * 以 8 为例
+     * 8 的二进制为 1000， -8的二进制为，8的二进制按位取反加1，仍然为 1000
+     * 所以 8 & -8 = 8
+     * @param val
+     * @return
+     */
     private static boolean isPowerOfTwo(int val) {
         return (val & -val) == val;
     }
 
+    /**
+     * 从 children 数组中选择出下一个child
+     */
     private interface EventExecutorChooser {
         EventExecutor next();
     }
 
+    /**
+     * children数组长度是2的幂次方，采用位操作
+     */
     private final class PowerOfTwoEventExecutorChooser implements EventExecutorChooser {
         @Override
         public EventExecutor next() {
@@ -224,6 +237,9 @@ public abstract class MultithreadEventExecutorGroup extends AbstractEventExecuto
         }
     }
 
+    /**
+     * 采用取模的方式，一般的操作
+     */
     private final class GenericEventExecutorChooser implements EventExecutorChooser {
         @Override
         public EventExecutor next() {
