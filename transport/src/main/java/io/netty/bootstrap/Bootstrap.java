@@ -111,6 +111,10 @@ public final class Bootstrap extends AbstractBootstrap<Bootstrap, Channel> {
             throw new NullPointerException("remoteAddress");
         }
 
+        /**
+         * 对一些基础参数进行判断
+         * 如 group、channel、handler
+         */
         validate();
         return doConnect(remoteAddress, localAddress());
     }
@@ -133,6 +137,7 @@ public final class Bootstrap extends AbstractBootstrap<Bootstrap, Channel> {
         /**
          * 新建 NioSocketChannel , 并将该channel 注册到一个 eventLoop 上去
          * 返回的 ChannelFuture 子类为 DefaultChannelPromise
+         * 这步的操作都是本机操作,还不涉及到网络操作
          */
         final ChannelFuture regFuture = initAndRegister();
         final Channel channel = regFuture.channel();
@@ -141,6 +146,11 @@ public final class Bootstrap extends AbstractBootstrap<Bootstrap, Channel> {
         }
 
         final ChannelPromise promise = channel.newPromise();
+
+        /**
+         * 根据注册时,返回的channelFuture的状态来决定,进行connect操作
+         * 这里都是完全异步的,如果注册还没有完成,则会监听注册的状态,在注册完成时,才会进行connect操作
+         */
         if (regFuture.isDone()) {
             doConnect0(regFuture, channel, remoteAddress, localAddress, promise);
         } else {

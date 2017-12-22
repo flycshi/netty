@@ -409,6 +409,11 @@ public abstract class AbstractChannel extends DefaultAttributeMap implements Cha
 
             AbstractChannel.this.eventLoop = eventLoop;
 
+            /**
+             * 注册都是由用户线程发起的,所以这里都会走到else分支,分装一个task
+             * 在eventloop的处理才会走入if分支
+             * 这里也是一个异步注册操作
+             */
             if (eventLoop.inEventLoop()) {
                 register0(promise);
             } else {
@@ -441,7 +446,13 @@ public abstract class AbstractChannel extends DefaultAttributeMap implements Cha
                 if (!promise.setUncancellable() || !ensureOpen(promise)) {
                     return;
                 }
+                /**
+                 * 进行注册,但是没有监听任何事件
+                 */
                 doRegister();
+                /**
+                 * 标识该channel已经被注册到一个eventloop上了
+                 */
                 registered = true;
                 safeSetSuccess(promise);
                 /**
@@ -451,6 +462,7 @@ public abstract class AbstractChannel extends DefaultAttributeMap implements Cha
                 if (isActive()) {
                     /**
                      * 如果channel还处于活跃状态，则调用ChannlePipeline的fireChannelActive方法
+                     * 会在head的channelActive中,逐步调用,将感兴趣的事件,添加到selectionKey上去
                      */
                     pipeline.fireChannelActive();
                 }

@@ -296,6 +296,10 @@ public abstract class AbstractBootstrap<B extends AbstractBootstrap<B, C>, C ext
     final ChannelFuture initAndRegister() {
         final Channel channel = channelFactory().newChannel();
         try {
+            /**
+             * 设置一些option、attr
+             * 把handler加入到该channel的channelPipeline中
+             */
             init(channel);
         } catch (Throwable t) {
             channel.unsafe().closeForcibly();
