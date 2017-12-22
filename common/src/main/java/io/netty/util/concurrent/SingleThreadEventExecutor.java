@@ -121,6 +121,9 @@ public abstract class SingleThreadEventExecutor extends AbstractEventExecutor {
                     logger.warn("Unexpected exception from an event executor: ", t);
                 } finally {
                     for (;;) {
+                        /**
+                         * 确保退出循环时,state的值已经不小于 ST_SHUTTING_DOWN
+                         */
                         int oldState = STATE_UPDATER.get(SingleThreadEventExecutor.this);
                         if (oldState >= ST_SHUTTING_DOWN || STATE_UPDATER.compareAndSet(
                                 SingleThreadEventExecutor.this, oldState, ST_SHUTTING_DOWN)) {
@@ -840,6 +843,9 @@ public abstract class SingleThreadEventExecutor extends AbstractEventExecutor {
     private void startThread() {
         if (STATE_UPDATER.get(this) == ST_NOT_STARTED) {
             if (STATE_UPDATER.compareAndSet(this, ST_NOT_STARTED, ST_STARTED)) {
+                /**
+                 * 添加了一个定时任务,用来定期的将任务队列中那些已经cancell的任务删除掉
+                 */
                 delayedTaskQueue.add(new ScheduledFutureTask<Void>(
                         this, delayedTaskQueue, Executors.<Void>callable(new PurgeTask(), null),
                         ScheduledFutureTask.deadlineNanos(SCHEDULE_PURGE_INTERVAL), -SCHEDULE_PURGE_INTERVAL));

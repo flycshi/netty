@@ -70,6 +70,9 @@ public abstract class AbstractNioChannel extends AbstractChannel {
         this.ch = ch;
         this.readInterestOp = readInterestOp;
         try {
+            /**
+             * 将channel设置为非阻塞,netty中的channel都必须为非阻塞的
+             */
             ch.configureBlocking(false);
         } catch (IOException e) {
             try {

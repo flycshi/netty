@@ -164,6 +164,9 @@ final class DefaultChannelPipeline implements ChannelPipeline {
 
     private void addBefore0(
             final String name, AbstractChannelHandlerContext ctx, AbstractChannelHandlerContext newCtx) {
+        /**
+         * 检查新的handler是否可以在多个channelPipeline之间共享,以及是否已经被添加到其他的channelPipeline中
+         */
         checkMultiplicity(newCtx);
 
         newCtx.prev = ctx.prev;
