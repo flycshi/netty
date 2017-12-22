@@ -500,6 +500,11 @@ public final class NioEventLoop extends SingleThreadEventLoop {
         }
     }
 
+    /**
+     * 这里就是对channel的各类事件的处理总入口
+     * @param k
+     * @param ch
+     */
     private static void processSelectedKey(SelectionKey k, AbstractNioChannel ch) {
         final NioUnsafe unsafe = ch.unsafe();
         if (!k.isValid()) {

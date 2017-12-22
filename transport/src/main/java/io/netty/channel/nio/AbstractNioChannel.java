@@ -202,6 +202,9 @@ public abstract class AbstractNioChannel extends AbstractChannel {
 
                 boolean wasActive = isActive();
                 if (doConnect(remoteAddress, localAddress)) {
+                    /**
+                     * 连接成功,则会触发channelActive事件,以及将selectionKey的监听事件中加入read事件
+                     */
                     fulfillConnectPromise(promise, wasActive);
                 } else {
                     connectPromise = promise;
@@ -210,6 +213,10 @@ public abstract class AbstractNioChannel extends AbstractChannel {
                     // Schedule connect timeout.
                     int connectTimeoutMillis = config().getConnectTimeoutMillis();
                     if (connectTimeoutMillis > 0) {
+                        /**
+                         * 如果超时时间大于0, 则设置一个定时任务, 在超时时间时, 检查连接是否成功,
+                         * 如果还没有连接上, 则会抛出连接超时异常, 这是netty自己做的一个超时检查任务
+                         */
                         connectTimeoutFuture = eventLoop().schedule(new OneTimeTask() {
                             @Override
                             public void run() {
@@ -300,6 +307,9 @@ public abstract class AbstractNioChannel extends AbstractChannel {
             } finally {
                 // Check for null as the connectTimeoutFuture is only created if a connectTimeoutMillis > 0 is used
                 // See https://github.com/netty/netty/issues/1770
+                /**
+                 * 在连接完成的时候, 如果设置了连接超时的检测任务, 则将该任务取消掉
+                 */
                 if (connectTimeoutFuture != null) {
                     connectTimeoutFuture.cancel(false);
                 }

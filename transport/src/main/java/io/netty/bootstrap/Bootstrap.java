@@ -130,6 +130,10 @@ public final class Bootstrap extends AbstractBootstrap<Bootstrap, Channel> {
      * @see {@link #connect()}
      */
     private ChannelFuture doConnect(final SocketAddress remoteAddress, final SocketAddress localAddress) {
+        /**
+         * 新建 NioSocketChannel , 并将该channel 注册到一个 eventLoop 上去
+         * 返回的 ChannelFuture 子类为 DefaultChannelPromise
+         */
         final ChannelFuture regFuture = initAndRegister();
         final Channel channel = regFuture.channel();
         if (regFuture.cause() != null) {
