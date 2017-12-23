@@ -20,6 +20,8 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * A skeletal {@link Future} implementation which represents a {@link Future} which has been completed already.
+ * 一个精简版的 Futre 实现
+ * 用来表示一个已经被完成的 Future
  */
 public abstract class CompleteFuture<V> extends AbstractFuture<V> {
 

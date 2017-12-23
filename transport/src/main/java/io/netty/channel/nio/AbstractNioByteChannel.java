@@ -174,6 +174,9 @@ public abstract class AbstractNioByteChannel extends AbstractNioChannel {
 
         for (;;) {
             Object msg = in.current();
+            /**
+             * 如果待发送的消息为空，则消息已经全部发送完，则清除write标识，退出循环
+             */
             if (msg == null) {
                 // Wrote all messages.
                 clearOpWrite();
@@ -183,6 +186,9 @@ public abstract class AbstractNioByteChannel extends AbstractNioChannel {
             if (msg instanceof ByteBuf) {
                 ByteBuf buf = (ByteBuf) msg;
                 int readableBytes = buf.readableBytes();
+                /**
+                 * 如果没有可写的字节，说明是空消息，则直接略过
+                 */
                 if (readableBytes == 0) {
                     in.remove();
                     continue;
@@ -199,20 +205,44 @@ public abstract class AbstractNioByteChannel extends AbstractNioChannel {
                     }
                 }
 
+                /**
+                 * 写半包标识
+                 * true表示消息只发送了部分
+                 */
                 boolean setOpWrite = false;
+                /**
+                 * 消息完全发送标识
+                 * true说明消息已经全部发送
+                 */
                 boolean done = false;
+                /**
+                 * 发送的字节数
+                 */
                 long flushedAmount = 0;
+                /**
+                 * 设置本次循环发送的次数，避免tcp写缓冲区满了，导致线程一直阻塞在该处
+                 */
                 if (writeSpinCount == -1) {
                     writeSpinCount = config().getWriteSpinCount();
                 }
                 for (int i = writeSpinCount - 1; i >= 0; i --) {
                     int localFlushedAmount = doWriteBytes(buf);
+                    /**
+                     * 如果发送字节为空，说明tcp缓冲区已经满了，退出循环
+                     * 设置写半包标识为true
+                     * 退出循环
+                     */
                     if (localFlushedAmount == 0) {
                         setOpWrite = true;
                         break;
                     }
 
                     flushedAmount += localFlushedAmount;
+                    /**
+                     * 如果没有可读字节，说明消息已经全部发送
+                     * 设置done标识为true
+                     * 退出循环
+                     */
                     if (!buf.isReadable()) {
                         done = true;
                         break;
@@ -222,8 +252,14 @@ public abstract class AbstractNioByteChannel extends AbstractNioChannel {
                 in.progress(flushedAmount);
 
                 if (done) {
+                    /**
+                     * 发送完成，从循环数组中清除该数据
+                     */
                     in.remove();
                 } else {
+                    /**
+                     * 设置写半包标识
+                     */
                     incompleteWrite(setOpWrite);
                     break;
                 }
