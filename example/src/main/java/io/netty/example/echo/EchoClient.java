@@ -37,6 +37,10 @@ import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
  */
 public final class EchoClient {
 
+    static {
+        System.setProperty("host", "192.168.31.122");
+    }
+
     static final boolean SSL = System.getProperty("ssl") != null;
     static final String HOST = System.getProperty("host", "127.0.0.1");
     static final int PORT = Integer.parseInt(System.getProperty("port", "8007"));
@@ -62,9 +66,9 @@ public final class EchoClient {
                  @Override
                  public void initChannel(SocketChannel ch) throws Exception {
                      ChannelPipeline p = ch.pipeline();
-                     if (sslCtx != null) {
-                         p.addLast(sslCtx.newHandler(ch.alloc(), HOST, PORT));
-                     }
+//                     if (sslCtx != null) {
+//                         p.addLast(sslCtx.newHandler(ch.alloc(), HOST, PORT));
+//                     }
                      //p.addLast(new LoggingHandler(LogLevel.INFO));
                      p.addLast(new EchoClientHandler());
                  }
