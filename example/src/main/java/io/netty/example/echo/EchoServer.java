@@ -54,16 +54,16 @@ public final class EchoServer {
             ServerBootstrap b = new ServerBootstrap();
             b.group(bossGroup, workerGroup)
              .channel(NioServerSocketChannel.class)
-             .option(ChannelOption.SO_BACKLOG, 100)
+             .option(ChannelOption.SO_BACKLOG, 1)
              .handler(new LoggingHandler(LogLevel.INFO))
              .childHandler(new ChannelInitializer<SocketChannel>() {
                  @Override
                  public void initChannel(SocketChannel ch) throws Exception {
                      ChannelPipeline p = ch.pipeline();
-                     if (sslCtx != null) {
-                         p.addLast(sslCtx.newHandler(ch.alloc()));
-                     }
-                     //p.addLast(new LoggingHandler(LogLevel.INFO));
+//                     if (sslCtx != null) {
+//                         p.addLast(sslCtx.newHandler(ch.alloc()));
+//                     }
+                     p.addLast(new LoggingHandler(LogLevel.INFO));
                      p.addLast(new EchoServerHandler());
                  }
              });
