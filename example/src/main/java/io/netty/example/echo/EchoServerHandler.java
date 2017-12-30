@@ -51,6 +51,7 @@ public class EchoServerHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         logger.info("i am active");
-        ctx.channel().close().sync();
+//        ctx.channel().close().sync();
+        ctx.fireChannelActive();
     }
 }

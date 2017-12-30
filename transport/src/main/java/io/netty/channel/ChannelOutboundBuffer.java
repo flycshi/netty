@@ -320,7 +320,13 @@ public final class ChannelOutboundBuffer {
         }
     }
 
+    /**
+     * 将 flushed 索引对应的msg给remove掉
+     */
     public boolean remove() {
+        /**
+         * 如果当前数据都已经flush了,则直接返回false,说明remove操作失败
+         */
         if (isEmpty()) {
             return false;
         }

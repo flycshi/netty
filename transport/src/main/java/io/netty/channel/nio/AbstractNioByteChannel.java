@@ -194,6 +194,9 @@ public abstract class AbstractNioByteChannel extends AbstractNioChannel {
                     continue;
                 }
 
+                /**
+                 * 如果不是堆外内存中的buf
+                 */
                 if (!buf.isDirect()) {
                     ByteBufAllocator alloc = alloc();
                     if (alloc.isDirectBufferPooled()) {

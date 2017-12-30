@@ -16,16 +16,12 @@
 package io.netty.example.echo;
 
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.ChannelPipeline;
-import io.netty.channel.EventLoopGroup;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.logging.LogLevel;
-import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
 
@@ -37,9 +33,9 @@ import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
  */
 public final class EchoClient {
 
-    static {
-        System.setProperty("host", "192.168.31.122");
-    }
+//    static {
+//        System.setProperty("host", "192.168.31.122");
+//    }
 
     static final boolean SSL = System.getProperty("ssl") != null;
     static final String HOST = System.getProperty("host", "127.0.0.1");
@@ -74,14 +70,55 @@ public final class EchoClient {
                  }
              });
 
-            // Start the client.
-            ChannelFuture f = b.connect(HOST, PORT).sync();
+            for (int i = 0; i < 10; i++) {
+                new MyThread(b, i).start();
+            }
 
-            // Wait until the connection is closed.
-            f.channel().closeFuture().sync();
+//            // Start the client.
+//            ChannelFuture f = b.connect(HOST, PORT).sync();
+//
+//            // Wait until the connection is closed.
+//            f.channel().closeFuture().sync();
+
+            while (true) {
+                try {
+                    Thread.sleep(1000);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
         } finally {
             // Shut down the event loop to terminate all threads.
             group.shutdownGracefully();
         }
     }
+
+    public static class MyThread extends Thread {
+        Bootstrap b;
+        int index;
+        public MyThread(Bootstrap b, int index) {
+            this.b = b;
+            this.index = index;
+        }
+
+        @Override
+        public void run() {
+            try {
+                ChannelFuture f = b.connect(HOST, PORT).sync();
+
+                ByteBuf buffer = Unpooled.buffer();
+                buffer.writeBytes(String.format("hello %d", index).getBytes());
+                System.out.println("wirte start " + index);
+                f.channel().writeAndFlush(buffer).sync();
+                System.out.println("write finished " + index);
+                f.channel().close();
+                f.channel().closeFuture().sync();
+            } catch (Exception e) {
+                System.out.println("error " + index);
+                e.printStackTrace();
+            }
+        }
+    }
+
 }

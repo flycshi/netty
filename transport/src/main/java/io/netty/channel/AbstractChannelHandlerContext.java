@@ -15,8 +15,6 @@
  */
 package io.netty.channel;
 
-import static io.netty.channel.DefaultChannelPipeline.logger;
-
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.util.DefaultAttributeMap;
 import io.netty.util.Recycler;
@@ -27,6 +25,8 @@ import io.netty.util.internal.OneTimeTask;
 import io.netty.util.internal.StringUtil;
 
 import java.net.SocketAddress;
+
+import static io.netty.channel.DefaultChannelPipeline.logger;
 
 abstract class AbstractChannelHandlerContext extends DefaultAttributeMap implements ChannelHandlerContext {
 
@@ -819,6 +819,9 @@ abstract class AbstractChannelHandlerContext extends DefaultAttributeMap impleme
         if (promise.isDone()) {
             // Check if the promise was cancelled and if so signal that the processing of the operation
             // should not be performed.
+            /**
+             * 检查promise是否被取消掉了, 如果被取消了, 则触发停止后续操作的指令
+             */
             //
             // See https://github.com/netty/netty/issues/2349
             if (promise.isCancelled()) {
@@ -827,11 +830,17 @@ abstract class AbstractChannelHandlerContext extends DefaultAttributeMap impleme
             throw new IllegalArgumentException("promise already done: " + promise);
         }
 
+        /**
+         * 判断 channel 是否是同一个
+         */
         if (promise.channel() != channel()) {
             throw new IllegalArgumentException(String.format(
                     "promise.channel does not match: %s (expected: %s)", promise.channel(), channel()));
         }
 
+        /**
+         * 判断channelPipeline的类型是否正确
+         */
         if (promise.getClass() == DefaultChannelPromise.class) {
             return true;
         }
