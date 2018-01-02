@@ -25,6 +25,7 @@ import static io.netty.util.internal.ObjectUtil.checkNotNull;
 /**
  * Allocates a new receive buffer whose capacity is probably large enough to read all inbound data and small enough
  * not to waste its space.
+ * 分配一个新的接受数据的buffer, 该buffer的容量足够大, 可以读取所有的数据, 同时又足够小, 不浪费空间
  */
 public interface RecvByteBufAllocator {
     /**
